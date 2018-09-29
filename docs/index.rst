@@ -5,29 +5,17 @@
 
 Welcome to nhlapi's documentation!
 ==================================
+This documentation is for the programmatic Python API. It supports both synchronous and asynchronous HTTP clients.
+It also offers a few objects that make it easier to interact with the API, such as :class:`nhlapi.utils.Season`.
+
+To get complete information about the NHL API consult `dword4's docs`_.
+
+.. _dword4's docs: https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :numbered:
+    :caption: Contents:
 
-.. automodule:: nhlapi.endpoints
-    :members:
-    :undoc-members:
-
-.. automodule:: nhlapi.sync
-    :members:
-    :undoc-members:
-
-.. automodule:: nhlapi.props
-    :members:
-    :undoc-members:
-    :special-members:
-    :exclude-members: __slots__, __dict__, __module__, __abstractmethods__, __weakref__
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    endpoints
+    api

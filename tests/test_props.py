@@ -1,4 +1,4 @@
-from nhlapi.props import wrap, PropDict, PropList
+from nhlapi.props import PropDict, PropList, wrap
 
 d = {"name": "abcdef", "info": {"age": 28, "height": 180}, "qualities": ["nice", "funny"]}
 a = [1, dict(), []]

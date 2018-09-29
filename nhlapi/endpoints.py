@@ -1,48 +1,86 @@
-from .props import wrap
-
-
-def _maybe_join(values):
-    if values is not None:
-        return ",".join(map(str, values))
+def _maybe(val, func):
+    if val is not None:
+        return func(val)
     return None
+
+
+def _join(vals):
+    if isinstance(vals, (list, tuple)):
+        return ",".join(map(str, vals))
+    return str(vals)
+
+
+def _date_fmt(date):
+    return date.strftime("%Y-%m-%d")
 
 
 API_BASE_URL = "https://statsapi.web.nhl.com/api/v1"
 
 
 class NHLAPI:
+    """
+    Initialize this class with the client you wish to use. It works transparently with the synchronous and asynchronous
+    clients.
+
+    Every method in this class returns a :class:`nhlapi.props.PropDict`, a special kind of dictionary that can access
+    items with attribute access. For instance, here's how to get information about teams::
+
+        api = NHLAPI(sync.Client())
+        result = api.teams()
+        for team in result.teams:
+            print(team.id, team.name, team.venue.name)
+
+    And the printed output would be::
+
+        1 New Jersey Devils Prudential Center
+        2 New York Islanders Barclays Center
+        3 New York Rangers Madison Square Garden
+
+    """
+
     def __init__(self, client):
         self._client = client
 
     def _get(self, endpoint, **params):
-        return wrap(self._client.get(API_BASE_URL + endpoint, params))
+        params = {key: val for key, val in params.items() if val is not None}
+        return self._client.get(API_BASE_URL + endpoint, params)
 
-    def teams(self, id=None, expand=None, stats=None):
+    def teams(self, id=None, *, expand=None, stats=None):
         """
-        Get the list of teams.
+        Get the list of teams. Use the expand parameter, either as a str or list of str to get more information.
+
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#teams>`__
 
         :param id: team id(s)
         :param expand: expanded information, see API docs
         :param stats: type of stats to show, see API docs
-        :type id: int or list[int] or None
-        :type expand: str or list[str] or None
-        :type stats: str or list[str] or None
+        :type id: int or list[int]
+        :type expand: str or list[str]
+        :type stats: str or list[str]
         """
-        id = _maybe_join(id)
-        expand = _maybe_join(expand)
-        stats = _maybe_join(stats)
+        return self._get("/teams", teamId=_maybe(id, _join), expand=_maybe(expand, _join), stats=_maybe(stats, _join))
 
-        return self._get("/teams", id=id, expand=expand, stats=stats)
+    def team_stats(self, team_id):
+        """
+        Get information about the team's stats.
+
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#team-stats>`__
+
+        :param int team_id: team id
+        """
+        return self._get("/teams/{}/stats".format(team_id))
 
     def divisions(self, id=None):
         """
         Get the list of divisions
 
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#divisions>`__
+
         :param id: division id
-        :type id: int or None
+        :type id: int
         """
         if id is not None:
-            return self._get("/divisions/" + str(id))
+            return self._get("/divisions/{}".format(id))
         else:
             return self._get("/divisions")
 
@@ -50,22 +88,83 @@ class NHLAPI:
         """
         Get the list of conferences
 
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#conferences>`__
+
         :param id: conference id
-        :type id: int or None
+        :type id: int
         """
         if id is not None:
-            return self._get("/conferences/" + str(id))
+            return self._get("/conferences/{}".format(id))
         else:
             return self._get("/conferences")
 
-    def people(self, id, stats=False, stats_season=None):
+    def people(self, id, *, stats=None, stats_season=None):
         """
         Get information about a player. Use the stats parameter with a string to get a specific kind of stats.
+
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#people>`__
 
         :param int id: player id
         :param stats: wether to fetch stats or a specific kind of stats
         :param stats_season: specify for which season to get the stats
         :type stats: bool or str
-        :type stats_season: Season
+        :type stats_season: nhlapi.utils.Season
         """
-        pass
+        params = {}
+        if stats:
+            url = "/people/{}/stats".format(id)
+            params["stats"] = stats
+            if stats_season:
+                params["season"] = stats_season.concat()
+        else:
+            url = "/people/{}".format(id)
+        return self._get(url, **params)
+
+    def schedule(self, team_id=None, *, expand=None, date=None, start_date=None, end_date=None):
+        """
+        Get information about the schedule. Use the date parameters to filter for a specific date.
+
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#schedule>`__
+
+        :param int team_id: team id
+        :param expand: expanded information, see API docs
+        :param date: specific date
+        :param start_date: start date of a date span
+        :param end_date: end date of a date span
+        :type expand: str or list[str]
+        :type date: datetime.date
+        :type start_date: datetime.date
+        :type end_date: datetime.date
+        """
+        if date is not None and (start_date is not None or end_date is not None):
+            raise ValueError("cannot set both of date and start_date/end_date")
+        return self._get(
+            "/schedule",
+            teamId=_maybe(team_id, str),
+            expand=_maybe(expand, _join),
+            date=_maybe(date, _date_fmt),
+            startDate=_maybe(start_date, _date_fmt),
+            endDate=_maybe(end_date, _date_fmt),
+        )
+
+    def standings(self, *, expand=None, season=None, date=None):
+        """
+        Get information about the standings. Use the season or date parameter to filter for a specific season or date.
+
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#standings>`__
+
+        :param expand: expanded information, see API docs
+        :param season: get standings for this season
+        :param date: get standings at this date
+        :type expand: str or list[str]
+        :type season: nhlapi.utils.Season
+        :type date: datetime.date
+        """
+        if season is not None and date is not None:
+            raise ValueError("pick either season or date")
+        return self._get(
+            "/standings",
+            season=_maybe(season, lambda x: x.concat()),
+            date=_maybe(date, _date_fmt),
+            expand=_maybe(expand, _join),
+        )

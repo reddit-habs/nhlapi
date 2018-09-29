@@ -1,3 +1,4 @@
+import json
 from collections.abc import Mapping, Sequence
 
 
@@ -22,6 +23,9 @@ class PropDict(Mapping):
     def __getattr__(self, name):
         return wrap(self._inner[name])
 
+    def __repr__(self):
+        return repr(self._inner)
+
     def get(self, key, default=None):
         return wrap(self._inner.get(key, default))
 
@@ -35,6 +39,12 @@ class PropDict(Mapping):
     def items(self):
         for key, val in self._inner.items():
             yield key, wrap(val)
+
+    def json(self, pretty=False):
+        if pretty:
+            return json.dumps(self._inner, indent=2)
+        else:
+            return json.dumps(self._inner)
 
 
 class PropList(Sequence):
@@ -60,11 +70,20 @@ class PropList(Sequence):
     def __getitem__(self, index):
         return wrap(self._inner[index])
 
+    def __repr__(self):
+        return repr(self._inner)
+
     def get(self, index, default=None):
         try:
             return wrap(self._inner[index])
         except IndexError:
             return default
+
+    def json(self, pretty=False):
+        if pretty:
+            return json.dumps(self._inner, indent=2)
+        else:
+            return json.dumps(self._inner)
 
 
 def wrap(val):
