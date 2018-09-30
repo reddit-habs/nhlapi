@@ -1,3 +1,5 @@
+.. _endpoints:
+
 Endpoints Documentation
 =======================
 

@@ -11,7 +11,15 @@ Utilities
 Clients
 -------
 
-.. automodule:: nhlapi.sync
+Using `requests`
+
+.. automodule:: nhlapi.io
+    :members:
+    :undoc-members:
+
+Using `aiohttp`
+
+.. automodule:: nhlapi.aio
     :members:
     :undoc-members:
 

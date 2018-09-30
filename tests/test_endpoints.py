@@ -7,7 +7,7 @@ from nhlapi.utils import Season
 
 
 class MockClient:
-    def get(self, url, params):
+    def get(self, url, params=None):
         self.url = url
         self.params = params
 

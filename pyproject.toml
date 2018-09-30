@@ -6,6 +6,8 @@ authors = ["Simon Bernier St-Pierre <sbernierstpierre@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.5"
+requests = {version = "^2.19",optional = true}
+aiohttp = {version = "^3.4",optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.8"

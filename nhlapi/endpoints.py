@@ -25,7 +25,7 @@ class NHLAPI:
     Every method in this class returns a :class:`nhlapi.props.PropDict`, a special kind of dictionary that can access
     items with attribute access. For instance, here's how to get information about teams::
 
-        api = NHLAPI(sync.Client())
+        api = NHLAPI(nhlapi.io.Client())
         result = api.teams()
         for team in result.teams:
             print(team.id, team.name, team.venue.name)
@@ -35,6 +35,7 @@ class NHLAPI:
         1 New Jersey Devils Prudential Center
         2 New York Islanders Barclays Center
         3 New York Rangers Madison Square Garden
+        ...
 
     """
 
