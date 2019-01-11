@@ -1,17 +1,22 @@
-def _maybe(val, func):
+from datetime import date, datetime
+
+from .utils import Param
+
+
+def _to_str(val):
+    if isinstance(val, Param):
+        return val.as_text()
+    if isinstance(val, (date, datetime)):
+        return val.strftime("%Y-%m-%d")
+    if isinstance(val, (list, tuple)):
+        return ",".join(map(_to_str, val))
+    return str(val)
+
+
+def _maybe(val, func=_to_str):
     if val is not None:
         return func(val)
     return None
-
-
-def _join(vals):
-    if isinstance(vals, (list, tuple)):
-        return ",".join(map(str, vals))
-    return str(vals)
-
-
-def _date_fmt(date):
-    return date.strftime("%Y-%m-%d")
 
 
 API_BASE_URL = "https://statsapi.web.nhl.com/api/v1"
@@ -59,7 +64,7 @@ class NHLAPI:
         :type expand: str or list[str]
         :type stats: str or list[str]
         """
-        return self._get("/teams", teamId=_maybe(id, _join), expand=_maybe(expand, _join), stats=_maybe(stats, _join))
+        return self._get("/teams", teamId=_maybe(id), expand=_maybe(expand), stats=_maybe(stats))
 
     def team_stats(self, team_id):
         """
@@ -71,14 +76,24 @@ class NHLAPI:
         """
         return self._get("/teams/{}/stats".format(team_id))
 
-    def divisions(self, id=None):
+    def boxscore(self, game_id):
+        """
+        Get information about a game's boxscore.
+
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#game>`__
+
+        :param GameId game_id: game id
+        """
+        return self._get("/game/{}/boxscore".format(game_id.as_text()))
+
+    def divisions(self, id: int = None):
         """
         Get the list of divisions
 
         `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#divisions>`__
 
         :param id: division id
-        :type id: int
+        :type id: int or None
         """
         if id is not None:
             return self._get("/divisions/{}".format(id))
@@ -116,7 +131,7 @@ class NHLAPI:
             url = "/people/{}/stats".format(id)
             params["stats"] = stats
             if stats_season:
-                params["season"] = stats_season.concat()
+                params["season"] = stats_season.as_text()
         else:
             url = "/people/{}".format(id)
         return self._get(url, **params)
@@ -142,10 +157,10 @@ class NHLAPI:
         return self._get(
             "/schedule",
             teamId=_maybe(team_id, str),
-            expand=_maybe(expand, _join),
-            date=_maybe(date, _date_fmt),
-            startDate=_maybe(start_date, _date_fmt),
-            endDate=_maybe(end_date, _date_fmt),
+            expand=_maybe(expand),
+            date=_maybe(date),
+            startDate=_maybe(start_date),
+            endDate=_maybe(end_date),
         )
 
     def standings(self, *, expand=None, season=None, date=None):
@@ -163,9 +178,4 @@ class NHLAPI:
         """
         if season is not None and date is not None:
             raise ValueError("pick either season or date")
-        return self._get(
-            "/standings",
-            season=_maybe(season, lambda x: x.concat()),
-            date=_maybe(date, _date_fmt),
-            expand=_maybe(expand, _join),
-        )
+        return self._get("/standings/byLeague", season=_maybe(season), date=_maybe(date), expand=_maybe(expand))

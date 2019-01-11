@@ -1,5 +1,4 @@
 import pytest
-
 from nhlapi.utils import GameId, GameKind, Season
 
 
@@ -28,5 +27,5 @@ def test_season_none():
 
 def test_game_code():
     x = GameId(Season(end=2018), 1000)
-    assert x.code() == "2017021000"
+    assert x.as_text() == "2017021000"
     assert x.kind == GameKind.REGULAR

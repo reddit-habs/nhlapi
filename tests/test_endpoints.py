@@ -1,7 +1,6 @@
 from datetime import date
 
 import pytest
-
 from nhlapi.endpoints import NHLAPI
 from nhlapi.utils import Season
 
@@ -114,7 +113,7 @@ def test_standings_season():
     api = NHLAPI(mock)
     api.standings(expand="foo", season=Season(2017))
 
-    assert mock.url == "https://statsapi.web.nhl.com/api/v1/standings"
+    assert mock.url == "https://statsapi.web.nhl.com/api/v1/standings/byLeague"
     assert mock.params["expand"] == "foo"
     assert mock.params["season"] == "20172018"
 
@@ -124,7 +123,7 @@ def test_standings_date():
     api = NHLAPI(mock)
     api.standings(expand="foo", date=date(2017, 1, 1))
 
-    assert mock.url == "https://statsapi.web.nhl.com/api/v1/standings"
+    assert mock.url == "https://statsapi.web.nhl.com/api/v1/standings/byLeague"
     assert mock.params["expand"] == "foo"
     assert mock.params["date"] == "2017-01-01"
 

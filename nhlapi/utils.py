@@ -1,7 +1,13 @@
 import enum
+from abc import ABCMeta
 
 
-class Season:
+class Param(metaclass=ABCMeta):
+    def as_text(self):
+        raise NotImplementedError
+
+
+class Season(Param):
     """
     This class is meant to facilitate the usage of seasons within the API.
     You can create this class with either the `begin`, the `end` parameter
@@ -26,8 +32,16 @@ class Season:
             self._begin = begin
             self._end = end
 
+    @classmethod
+    def fromstr(cls, s):
+        assert len(s) == 8
+        return Season(begin=int(s[:4]), end=int(s[4:]))
+
     def __repr__(self):
         return "Season({:04}-{:04})".format(self.begin, self.end)
+
+    def as_text(self):
+        return "{}{}".format(self.begin, self.end)
 
     @property
     def begin(self):
@@ -43,17 +57,6 @@ class Season:
         """
         return self._end
 
-    def concat(self):
-        """
-        This method returns the season identifier in concatenated form.
-
-            >>> Season(begin=2017).concat()
-            "20172018"
-
-        :rtype: str
-        """
-        return "{}{}".format(self._begin, self._end)
-
 
 class GameKind(enum.IntEnum):
     PRESEASON = 1
@@ -61,11 +64,14 @@ class GameKind(enum.IntEnum):
     PLAYOFFS = 3
     ALLSTARS = 4
 
-    def __format__(self, spec):
+    def as_text(self):
         return "{:02}".format(self.value)
 
 
-class GameId:
+Param.register(GameKind)
+
+
+class GameId(Param):
     """
     Create a new GameId with the given info.
 
@@ -81,6 +87,22 @@ class GameId:
         self._season = season
         self._number = number
         self._kind = kind
+
+    @classmethod
+    def fromstr(cls, s):
+        assert len(s) == 8
+        return GameId(season=Season(begin=int(s[:4])), number=int(s[4:6]), kind=GameKind(int(s[6:])))
+
+    def __repr__(self):
+        return "Game({}, {}, {})".format(self._season, self._kind, self._number)
+
+    def as_text(self):
+        """
+        Use this method to get the game's 10 digit code.
+
+        :rtype: str
+        """
+        return "{:04}{:02}{:04}".format(self._season.begin, self._kind, self._number)
 
     @property
     def season(self):
@@ -103,13 +125,28 @@ class GameId:
         """
         return self._kind
 
-    def code(self):
-        """
-        Use this method to get the game's 10 digit code.
 
-        :rtype: str
-        """
-        return "{:04}{}{:04}".format(self._season.begin, self._kind, self._number)
+class TimeOnIce:
+    def __init__(self, seconds):
+        self._seconds = seconds
+
+    @classmethod
+    def fromstr(cls, s):
+        parts = s.split(":")
+        mins = int(parts[0]) * 60
+        secs = int(parts[1])
+        return TimeOnIce(mins + secs)
+
+    def str(self):
+        mins, secs = divmod(self._seconds, 60)
+        return "{:02}:{:02}".format(mins, secs)
 
     def __repr__(self):
-        return "Game({}, {}, {})".format(self._season, self._kind, self._number)
+        return "TimeOnIce({})".format(str(self))
+
+    def __add__(self, other):
+        return TimeOnIce(self.seconds + other.seconds)
+
+    @property
+    def seconds(self):
+        return self._seconds
