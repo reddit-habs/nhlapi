@@ -82,9 +82,19 @@ class NHLAPI:
 
         `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#game>`__
 
-        :param GameId game_id: game id
+        :param GameId or int game_id: game id
         """
-        return self._get("/game/{}/boxscore".format(game_id.as_text()))
+        return self._get("/game/{}/boxscore".format(_to_str(game_id)))
+
+    def content(self, game_id):
+        """
+        Get detailed media information about a game.
+
+        `Docs <https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md#game>`__
+
+        :param GameId or int game_id: game id
+        """
+        return self._get("/game/{}/content".format(_to_str(game_id)))
 
     def divisions(self, id: int = None):
         """
