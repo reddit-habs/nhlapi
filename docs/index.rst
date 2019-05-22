@@ -31,7 +31,8 @@ You can do::
 
     data.team.name
 
-Note that it's still possible to use the square bracket syntax with the *magic* dictionaries.
+Note that it's still possible to use the square bracket syntax with the *magic* dictionaries. See :ref:`props` for more
+information about the *magic* dictionaries.
 
 Getting started
 ---------------
@@ -55,9 +56,9 @@ Table of contents
 -----------------
 
 .. toctree::
-    :maxdepth: 2
     :numbered:
     :caption: Contents:
 
+    props
     endpoints
     api
