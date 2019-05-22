@@ -13,3 +13,7 @@ aiohttp = {version = "^3.4",optional = true}
 pytest = "^3.8"
 sphinx = "^1.8"
 sphinxcontrib-fulltoc = "^1.2"
+
+[build-system]
+requires = ["poetry"]
+build-backend = "poetry.masonry.api"
