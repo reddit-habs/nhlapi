@@ -1,5 +1,5 @@
 import pytest
-from nhlapi.utils import GameId, GameKind, Param, Season
+from nhlapi.utils import GameId, GameKind, IUrlParam, Season
 
 
 def test_season_begin():
@@ -27,6 +27,6 @@ def test_season_none():
 
 def test_game_code():
     x = GameId(Season(end=2018), 1000)
-    assert isinstance(x, Param)
-    assert x.as_text() == "2017021000"
+    assert isinstance(x, IUrlParam)
+    assert x.to_url_param() == "2017021000"
     assert x.kind == GameKind.REGULAR

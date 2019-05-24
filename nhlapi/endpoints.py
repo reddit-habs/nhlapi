@@ -1,19 +1,7 @@
-from datetime import date, datetime
-
-from .utils import Param
+from .utils import to_url_param
 
 
-def _to_str(val):
-    if isinstance(val, Param):
-        return val.as_text()
-    if isinstance(val, (date, datetime)):
-        return val.strftime("%Y-%m-%d")
-    if isinstance(val, (list, tuple)):
-        return ",".join(map(_to_str, val))
-    return str(val)
-
-
-def _maybe(val, func=_to_str):
+def _maybe(val, func=to_url_param):
     if val is not None:
         return func(val)
     return None
@@ -84,7 +72,7 @@ class NHLAPI:
 
         :param GameId or int game_id: game id
         """
-        return self._get("/game/{}/boxscore".format(_to_str(game_id)))
+        return self._get("/game/{}/boxscore".format(to_url_param(game_id)))
 
     def content(self, game_id):
         """
@@ -94,7 +82,7 @@ class NHLAPI:
 
         :param GameId or int game_id: game id
         """
-        return self._get("/game/{}/content".format(_to_str(game_id)))
+        return self._get("/game/{}/content".format(to_url_param(game_id)))
 
     def divisions(self, id: int = None):
         """
@@ -141,7 +129,7 @@ class NHLAPI:
             url = "/people/{}/stats".format(id)
             params["stats"] = stats
             if stats_season:
-                params["season"] = stats_season.as_text()
+                params["season"] = stats_season.to_url_param()
         else:
             url = "/people/{}".format(id)
         return self._get(url, **params)

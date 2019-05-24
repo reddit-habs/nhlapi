@@ -1,13 +1,64 @@
 import enum
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
+from datetime import date, datetime
 
 
-class Param(metaclass=ABCMeta):
-    def as_text(self):
+class IUrlParam(metaclass=ABCMeta):
+    """
+    Implement this interface to be compatible with :func:`to_url_param`.
+    """
+
+    @abstractmethod
+    def to_url_param(self):
+        """
+        Converts this object into a :class:`str` that can be understood by the NHL API.
+
+        :rtype: str
+        """
         raise NotImplementedError
 
 
-class Season(Param):
+def to_url_param(val):
+    """
+    This function converts a value to an URL parameter compatible with the NHL API.
+
+    :param val:
+        * If `val` implements :class:`IUrlParam` it will be converted using the :meth:`to_url_param` method.
+        * If `val` is a :class:`date` or :class:`datetime` it will be converted to the YYYY-MM-DD format.
+        * If `val` is a :class:`list` or :class:`tuple` each item inside will be converted with :func:`to_url_param`
+          and joined with commas.
+        * If `val` is an :class:`int` it will be converted to a :class:`str`.
+        * If `val` is a :class:`str` it will be returned.
+        * Any other type will raise a :class:`TypeError`.
+    """
+    if isinstance(val, IUrlParam):
+        return val.to_url_param()
+    if isinstance(val, (date, datetime)):
+        return val.strftime("%Y-%m-%d")
+    if isinstance(val, (list, tuple)):
+        return ",".join(map(to_url_param, val))
+    if isinstance(val, int):
+        return str(val)
+    if isinstance(val, str):
+        return val
+    else:
+        raise TypeError("Cannot convert '{}' to url param".format(type(val)))
+
+
+class Year(IUrlParam):
+    """
+    Represents a 4 digit year. Use this when the API expects a year with 4 digits, as a normal :class:`int` will not
+    have leading zeroes.
+    """
+
+    def __init__(self, year):
+        self.year = year
+
+    def to_url_param(self):
+        return "{:04}".format(self.year)
+
+
+class Season(IUrlParam):
     """
     This class is meant to facilitate the usage of seasons within the API.
     You can create this class with either the `begin`, the `end` parameter
@@ -28,7 +79,8 @@ class Season(Param):
             self._begin = begin
             self._end = begin + 1
         else:
-            assert begin + 1 == end
+            if begin + 1 != end:
+                raise ValueError("begin is not 1 year less than end")
             self._begin = begin
             self._end = end
 
@@ -40,7 +92,7 @@ class Season(Param):
     def __repr__(self):
         return "Season({:04}-{:04})".format(self.begin, self.end)
 
-    def as_text(self):
+    def to_url_param(self):
         return "{}{}".format(self.begin, self.end)
 
     @property
@@ -64,14 +116,14 @@ class GameKind(enum.IntEnum):
     PLAYOFFS = 3
     ALLSTARS = 4
 
-    def as_text(self):
+    def to_url_param(self):
         return "{:02}".format(self.value)
 
 
-Param.register(GameKind)
+IUrlParam.register(GameKind)
 
 
-class GameId(Param):
+class GameId(IUrlParam):
     """
     Create a new GameId with the given info.
 
@@ -96,12 +148,7 @@ class GameId(Param):
     def __repr__(self):
         return "Game({}, {}, {})".format(self._season, self._kind, self._number)
 
-    def as_text(self):
-        """
-        Use this method to get the game's 10 digit code.
-
-        :rtype: str
-        """
+    def to_url_param(self):
         return "{:04}{:02}{:04}".format(self._season.begin, self._kind, self._number)
 
     @property

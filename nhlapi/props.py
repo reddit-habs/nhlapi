@@ -79,8 +79,8 @@ def wrap(val):
     it can be accessed via attributes.
 
     :param val: Value to be wrapped if necessary
-    :type val: :class:`collections.abc.Mapping` or :class:`collections.abc.Sequence` or any
-    :rtype: PropDict, PropList or any
+    :type val: :code:`mapping` or :code:`sequence` or any
+    :rtype: :class:`PropDict` or :class:`PropList` or any
     """
     if isinstance(val, _mapping_types):
         return PropDict(val)
