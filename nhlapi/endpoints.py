@@ -1,3 +1,4 @@
+from urllib.parse import urljoin, quote
 from .utils import to_url_param
 
 
@@ -7,7 +8,7 @@ def _maybe(val, func=to_url_param):
     return None
 
 
-API_BASE_URL = "https://statsapi.web.nhl.com/api/v1"
+API_BASE_URL = "https://statsapi.web.nhl.com"
 
 
 class NHLAPI:
@@ -34,6 +35,35 @@ class NHLAPI:
 
     def __init__(self, client):
         self._client = client
+
+    def get(self, url, *args, **kwargs):
+        """
+        Call an endpoint of the API. The endpoint is is given by the url argument. It can be an absolute URL
+        or a relative URL.
+
+        The `*args` will replaced in the URL using the :meth:`str.format`. This allows you to use insert text in path
+        segments.
+
+        .. code-block:: python3
+
+            api.get("/api/v1/teams/{0}", 8)
+
+        The `**kwargs` will be converted to query string parameters. This allows you to easily extend requests.
+
+        .. code-block:: python3
+
+            api.get("api/v1/teams", expand=["team.roster", "team.stats"])
+
+        The `*args` and `**kwargs` are converted using the :func:`to_url_param` function.
+
+        :returns: A JSON object wrapped inside an attribute access dictionary.
+        """
+        url = url.format(*[quote(to_url_param(val), safe="") for val in args if val is not None])
+        params = {key: to_url_param(val) for key, val in kwargs.items() if val is not None}
+
+        url = urljoin(API_BASE_URL, url)
+
+        return self._client.get(url, params)
 
     def _get(self, endpoint, **params):
         params = {key: val for key, val in params.items() if val is not None}

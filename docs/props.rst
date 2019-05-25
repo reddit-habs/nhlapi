@@ -3,7 +3,8 @@
 Attribute access dictionary
 ===========================
 
-The attribute access dictionary allows users to access items of a dictionary using attribute access. So instead of
+The attribute access dictionary allows users to access items of a dictionary using attribute access, similar to how
+JavaScript objects work. So instead of
 doing::
 
     d["foo"][0]["bar"]
@@ -19,7 +20,8 @@ Since the underlying dictionary can contain any key, the attribute access dictio
 could easily conflict with the data inside. In order to operate on the attribute access dictionary, use the functions
 inside the :mod:`nhlapi.props` module, such as :func:`nhlapi.props.keys`, :func:`nhlapi.props.get`, etc.
 
-------
+Attribute access dictionary API
+-------------------------------
 
 .. autofunction:: nhlapi.props.wrap
 .. autofunction:: nhlapi.props.get

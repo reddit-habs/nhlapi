@@ -1,7 +1,7 @@
 .. _endpoints:
 
-Endpoints Documentation
-=======================
+Endpoints
+=========
 
 .. automodule:: nhlapi.endpoints
     :members:
