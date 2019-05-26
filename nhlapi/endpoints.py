@@ -156,12 +156,12 @@ class NHLAPI:
         """
         params = {}
         if stats:
-            url = "/people/{}/stats".format(id)
+            url = "/api/v1/people/{}/stats".format(id)
             params["stats"] = stats
             if stats_season:
                 params["season"] = stats_season.to_url_param()
         else:
-            url = "/people/{}".format(id)
+            url = "/api/v1/people/{}".format(id)
         return self._get(url, **params)
 
     def schedule(self, team_id=None, *, expand=None, date=None, start_date=None, end_date=None):
@@ -183,7 +183,7 @@ class NHLAPI:
         if date is not None and (start_date is not None or end_date is not None):
             raise ValueError("cannot set both of date and start_date/end_date")
         return self._get(
-            "/schedule",
+            "/api/v1/schedule",
             teamId=_maybe(team_id, str),
             expand=_maybe(expand),
             date=_maybe(date),
