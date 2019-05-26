@@ -6,7 +6,7 @@ python:
 install:
   - pip install poetry
   - poetry install
-  - pip requests aiohttp
+  - pip install requests aiohttp
 # command to run tests
 script:
   - pytest
