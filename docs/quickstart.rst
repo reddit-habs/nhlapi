@@ -11,7 +11,7 @@ Depending on which client you choose, you will need to install the HTTP library 
 * For :class:`nhlapi.SyncClient`, :code:`pip install requests`
 * For :class:`nhlapi.AsyncClient`, :code:`pip install aiohttp`
 
-Then, create an instance of :class:`nhlapi.endpoints.NHLAPI` passing it client you have selected.
+Then, create an instance of :class:`nhlapi.endpoints.NHLAPI` passing it the client you have selected.
 
 Synchronous::
 
