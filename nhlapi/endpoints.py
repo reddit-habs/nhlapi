@@ -52,7 +52,7 @@ class NHLAPI:
 
         .. code-block:: python3
 
-            api.get("api/v1/teams", expand=["team.roster", "team.stats"])
+            api.get("/api/v1/teams", expand=["team.roster", "team.stats"])
 
         The `*args` and `**kwargs` are converted using the :func:`to_url_param` function.
 
@@ -82,7 +82,7 @@ class NHLAPI:
         :type expand: str or list[str]
         :type stats: str or list[str]
         """
-        return self._get("/teams", teamId=_maybe(id), expand=_maybe(expand), stats=_maybe(stats))
+        return self._get("/api/v1/teams", teamId=_maybe(id), expand=_maybe(expand), stats=_maybe(stats))
 
     def team_stats(self, team_id):
         """
@@ -92,7 +92,7 @@ class NHLAPI:
 
         :param int team_id: team id
         """
-        return self._get("/teams/{}/stats".format(team_id))
+        return self._get("/api/v1/teams/{}/stats".format(team_id))
 
     def boxscore(self, game_id):
         """
@@ -102,7 +102,7 @@ class NHLAPI:
 
         :param GameId or int game_id: game id
         """
-        return self._get("/game/{}/boxscore".format(to_url_param(game_id)))
+        return self._get("/api/v1/game/{}/boxscore".format(to_url_param(game_id)))
 
     def content(self, game_id):
         """
@@ -112,7 +112,7 @@ class NHLAPI:
 
         :param GameId or int game_id: game id
         """
-        return self._get("/game/{}/content".format(to_url_param(game_id)))
+        return self._get("/api/v1/game/{}/content".format(to_url_param(game_id)))
 
     def divisions(self, id: int = None):
         """
@@ -124,9 +124,9 @@ class NHLAPI:
         :type id: int or None
         """
         if id is not None:
-            return self._get("/divisions/{}".format(id))
+            return self._get("/api/v1/divisions/{}".format(id))
         else:
-            return self._get("/divisions")
+            return self._get("/api/v1/divisions")
 
     def conferences(self, id=None):
         """
@@ -138,9 +138,9 @@ class NHLAPI:
         :type id: int
         """
         if id is not None:
-            return self._get("/conferences/{}".format(id))
+            return self._get("/api/v1/conferences/{}".format(id))
         else:
-            return self._get("/conferences")
+            return self._get("/api/v1/conferences")
 
     def people(self, id, *, stats=None, stats_season=None):
         """
@@ -206,4 +206,4 @@ class NHLAPI:
         """
         if season is not None and date is not None:
             raise ValueError("pick either season or date")
-        return self._get("/standings/byLeague", season=_maybe(season), date=_maybe(date), expand=_maybe(expand))
+        return self._get("/api/v1/standings/byLeague", season=_maybe(season), date=_maybe(date), expand=_maybe(expand))
