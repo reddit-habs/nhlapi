@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Update docs on the server.
+
+set -Eeuxo pipefail
+
+cd /home/serv/nhlapi
+git pull
+
+source /home/serv/nhlapi/venv/bin/activate
+poetry install
+pip install requests
+pip install aiohttp
+
+cd /home/serv/nhlapi/docs
+make clean
+make html
