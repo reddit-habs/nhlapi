@@ -42,7 +42,11 @@ release = ""
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx", "sphinxcontrib.fulltoc"]
 
 autodoc_member_order = "bysource"
-intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "requests": ("http://2.python-requests.org/en/stable/", None),
+    "aiohttp": ("https://docs.aiohttp.org/en/stable", None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

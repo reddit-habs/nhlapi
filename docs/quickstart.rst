@@ -3,13 +3,13 @@
 Quick start
 ===========
 This library is very easy to use. First choose your HTTP client. If you are using `asyncio` use
-:class:`nhlapi.AsyncClient`, which uses `aiohttp`. If you are using synchronous code or aren't sure what the `asyncio`
-module does, use :class:`nhlapi.SyncClient`, which uses the `requests` library.
+:class:`nhlapi.clients.AsyncClient`, which uses `aiohttp`. If you are using synchronous code or aren't sure what the
+`asyncio` module does, use :class:`nhlapi.clients.SyncClient`, which uses the `requests` library.
 
 Depending on which client you choose, you will need to install the HTTP library it depends on.
 
-* For :class:`nhlapi.SyncClient`, :code:`pip install requests`
-* For :class:`nhlapi.AsyncClient`, :code:`pip install aiohttp`
+* For :class:`nhlapi.clients.SyncClient`, :code:`pip install requests`
+* For :class:`nhlapi.clients.AsyncClient`, :code:`pip install aiohttp`
 
 Then, create an instance of :class:`nhlapi.endpoints.NHLAPI` passing it the client you have selected.
 

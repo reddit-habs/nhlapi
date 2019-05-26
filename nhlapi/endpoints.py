@@ -39,7 +39,9 @@ class NHLAPI:
     def get(self, url, *args, **kwargs):
         """
         Call an endpoint of the API. The endpoint is is given by the url argument. It can be an absolute URL
-        or a relative URL.
+        or a relative URL. The documentation for the API is available here: `NHL API docs`_.
+
+        .. _NHL API docs: https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md
 
         The `*args` will replaced in the URL using the :meth:`str.format`. This allows you to use insert text in path
         segments.
@@ -56,6 +58,8 @@ class NHLAPI:
 
         The `*args` and `**kwargs` are converted using the :func:`to_url_param` function.
 
+        :raises: :class:`requests.HTTPError` if an error occurs and you use :class:`SyncClient`
+        :raises: :class:`aiohttp.ClientResponseError` if an error occurs and you use :class:`AsyncClient`
         :returns: A JSON object wrapped inside an attribute access dictionary.
         """
         url = url.format(*[quote(to_url_param(val), safe="") for val in args if val is not None])
