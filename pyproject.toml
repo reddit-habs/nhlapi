@@ -5,14 +5,14 @@ description = ""
 authors = ["Simon Bernier St-Pierre <sbernierstpierre@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = "^3.6"
 requests = {version = "^2.19",optional = true}
 aiohttp = {version = "^3.4",optional = true}
 
 [tool.poetry.dev-dependencies]
-pytest = "^3.8"
-sphinx = "^1.8"
-sphinxcontrib-fulltoc = "^1.2"
+pytest = "*"
+sphinx = "*"
+sphinxcontrib-fulltoc = "*"
 
 [build-system]
 requires = ["poetry"]

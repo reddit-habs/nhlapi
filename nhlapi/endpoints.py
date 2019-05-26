@@ -1,25 +1,14 @@
-from datetime import date, datetime
-
-from .utils import Param
-
-
-def _to_str(val):
-    if isinstance(val, Param):
-        return val.as_text()
-    if isinstance(val, (date, datetime)):
-        return val.strftime("%Y-%m-%d")
-    if isinstance(val, (list, tuple)):
-        return ",".join(map(_to_str, val))
-    return str(val)
+from urllib.parse import urljoin, quote
+from .utils import to_url_param
 
 
-def _maybe(val, func=_to_str):
+def _maybe(val, func=to_url_param):
     if val is not None:
         return func(val)
     return None
 
 
-API_BASE_URL = "https://statsapi.web.nhl.com/api/v1"
+API_BASE_URL = "https://statsapi.web.nhl.com"
 
 
 class NHLAPI:
@@ -47,6 +36,39 @@ class NHLAPI:
     def __init__(self, client):
         self._client = client
 
+    def get(self, url, *args, **kwargs):
+        """
+        Call an endpoint of the API. The endpoint is is given by the url argument. It can be an absolute URL
+        or a relative URL. The documentation for the API is available here: `NHL API docs`_.
+
+        .. _NHL API docs: https://gitlab.com/dword4/nhlapi/blob/master/stats-api.md
+
+        The `*args` will replaced in the URL using the :meth:`str.format`. This allows you to use insert text in path
+        segments.
+
+        .. code-block:: python3
+
+            api.get("/api/v1/teams/{0}", 8)
+
+        The `**kwargs` will be converted to query string parameters. This allows you to easily extend requests.
+
+        .. code-block:: python3
+
+            api.get("/api/v1/teams", expand=["team.roster", "team.stats"])
+
+        The `*args` and `**kwargs` are converted using the :func:`to_url_param` function.
+
+        :raises: :class:`requests.HTTPError` if an error occurs and you use :class:`SyncClient`
+        :raises: :class:`aiohttp.ClientResponseError` if an error occurs and you use :class:`AsyncClient`
+        :returns: A JSON object wrapped inside an attribute access dictionary.
+        """
+        url = url.format(*[quote(to_url_param(val), safe="") for val in args if val is not None])
+        params = {key: to_url_param(val) for key, val in kwargs.items() if val is not None}
+
+        url = urljoin(API_BASE_URL, url)
+
+        return self._client.get(url, params)
+
     def _get(self, endpoint, **params):
         params = {key: val for key, val in params.items() if val is not None}
         return self._client.get(API_BASE_URL + endpoint, params)
@@ -64,7 +86,7 @@ class NHLAPI:
         :type expand: str or list[str]
         :type stats: str or list[str]
         """
-        return self._get("/teams", teamId=_maybe(id), expand=_maybe(expand), stats=_maybe(stats))
+        return self._get("/api/v1/teams", teamId=_maybe(id), expand=_maybe(expand), stats=_maybe(stats))
 
     def team_stats(self, team_id):
         """
@@ -74,7 +96,7 @@ class NHLAPI:
 
         :param int team_id: team id
         """
-        return self._get("/teams/{}/stats".format(team_id))
+        return self._get("/api/v1/teams/{}/stats".format(team_id))
 
     def boxscore(self, game_id):
         """
@@ -84,7 +106,7 @@ class NHLAPI:
 
         :param GameId or int game_id: game id
         """
-        return self._get("/game/{}/boxscore".format(_to_str(game_id)))
+        return self._get("/api/v1/game/{}/boxscore".format(to_url_param(game_id)))
 
     def content(self, game_id):
         """
@@ -94,7 +116,7 @@ class NHLAPI:
 
         :param GameId or int game_id: game id
         """
-        return self._get("/game/{}/content".format(_to_str(game_id)))
+        return self._get("/api/v1/game/{}/content".format(to_url_param(game_id)))
 
     def divisions(self, id: int = None):
         """
@@ -106,9 +128,9 @@ class NHLAPI:
         :type id: int or None
         """
         if id is not None:
-            return self._get("/divisions/{}".format(id))
+            return self._get("/api/v1/divisions/{}".format(id))
         else:
-            return self._get("/divisions")
+            return self._get("/api/v1/divisions")
 
     def conferences(self, id=None):
         """
@@ -120,9 +142,9 @@ class NHLAPI:
         :type id: int
         """
         if id is not None:
-            return self._get("/conferences/{}".format(id))
+            return self._get("/api/v1/conferences/{}".format(id))
         else:
-            return self._get("/conferences")
+            return self._get("/api/v1/conferences")
 
     def people(self, id, *, stats=None, stats_season=None):
         """
@@ -138,12 +160,12 @@ class NHLAPI:
         """
         params = {}
         if stats:
-            url = "/people/{}/stats".format(id)
+            url = "/api/v1/people/{}/stats".format(id)
             params["stats"] = stats
             if stats_season:
-                params["season"] = stats_season.as_text()
+                params["season"] = stats_season.to_url_param()
         else:
-            url = "/people/{}".format(id)
+            url = "/api/v1/people/{}".format(id)
         return self._get(url, **params)
 
     def schedule(self, team_id=None, *, expand=None, date=None, start_date=None, end_date=None):
@@ -165,7 +187,7 @@ class NHLAPI:
         if date is not None and (start_date is not None or end_date is not None):
             raise ValueError("cannot set both of date and start_date/end_date")
         return self._get(
-            "/schedule",
+            "/api/v1/schedule",
             teamId=_maybe(team_id, str),
             expand=_maybe(expand),
             date=_maybe(date),
@@ -188,4 +210,4 @@ class NHLAPI:
         """
         if season is not None and date is not None:
             raise ValueError("pick either season or date")
-        return self._get("/standings/byLeague", season=_maybe(season), date=_maybe(date), expand=_maybe(expand))
+        return self._get("/api/v1/standings/byLeague", season=_maybe(season), date=_maybe(date), expand=_maybe(expand))

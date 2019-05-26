@@ -1,6 +1,12 @@
 *.pyc
+*.pyo
 __pycache__/
+*.egg-info
+
 .venv/
-.pytest_cache/
-.ropeproject/
-docs/_build
+/venv/
+/.pytest_cache/
+/.ropeproject/
+/.vscode/
+
+/docs/_build

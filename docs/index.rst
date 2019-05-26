@@ -1,7 +1,4 @@
-.. nhlapi documentation master file, created by
-   sphinx-quickstart on Fri Sep 28 23:36:51 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. _index:
 
 Welcome to nhlapi's documentation!
 ==================================
@@ -22,42 +19,19 @@ So for instance, you can easily get the schedule for a specific date using::
 
 The library also supports synchronous (using `requests`) and asynchronous (using `aiohttp`) HTTP requests transparently.
 
-The objects returned by the various endpoints are *magic* immutable dictionaries that allow access of fields using
-properties. So instead of doing::
-
-    data["team"]["name"]
-
-You can do::
-
-    data.team.name
-
-Note that it's still possible to use the square bracket syntax with the *magic* dictionaries.
-
-Getting started
----------------
-This library is very easy to use. Create an instance of :class:`nhlapi.endpoints.NHLAPI` with either
-:class:`nhlapi.io.Client` or :class:`nhlapi.aio.Client` and start calling endpoints. Note that when using the asynchronous
-client, you need to await the calls to endpoints because it returns a future.
-
-Synchronous::
-
-    api = NHLAPI(nhlapi.io.Client())
-    result = api.teams()
-
-Asynchronous::
-
-    api = NHLAPI(nhlapi.aio.Client())
-    result = await api.teams()
-
-Consult :ref:`endpoints` to know how to access more information.
+The objects returned by the various endpoints support a syntax similar to JavaScript objects and can be accessed with
+the dot notation. See :ref:`props` for more information.
 
 Table of contents
 -----------------
 
 .. toctree::
-    :maxdepth: 2
     :numbered:
     :caption: Contents:
 
+    install
+    quickstart
+    props
     endpoints
-    api
+    utils
+    clients
