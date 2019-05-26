@@ -2,11 +2,11 @@ language: python
 python:
   - "3.5"
   - "3.6"
-  - "3.7"
 # command to install dependencies
 install:
-  - pip install requests aiohttp poetry
+  - pip install poetry
   - poetry install
+  - pip requests aiohttp
 # command to run tests
 script:
   - pytest
