@@ -5,8 +5,8 @@ python:
   - "3.7"
 # command to install dependencies
 install:
+  - pip install requests aiohttp poetry
   - poetry install
-  - pip install requests aiohttp
 # command to run tests
 script:
   - pytest
